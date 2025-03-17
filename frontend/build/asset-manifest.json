@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/static/css/main.594043c0.css",
+    "main.js": "/static/js/main.d7c571cc.js",
+    "static/media/jobtracker-logo.jpg": "/static/media/jobtracker-logo.1db786da2f2c064b0357.jpg",
+    "index.html": "/index.html",
+    "main.594043c0.css.map": "/static/css/main.594043c0.css.map",
+    "main.d7c571cc.js.map": "/static/js/main.d7c571cc.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.594043c0.css",
+    "static/js/main.d7c571cc.js"
+  ]
+}
