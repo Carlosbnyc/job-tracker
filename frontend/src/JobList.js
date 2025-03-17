@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import './JobList.css'; // Import the CSS for styling
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5001/api";
 
@@ -23,7 +24,7 @@ function JobList() {
   }, []);
 
   return (
-    <div>
+    <div className="job-list-container">
       <h2>Jobs Applied</h2>
       {jobs.length === 0 ? (
         <p>No jobs added yet.</p>
@@ -36,7 +37,8 @@ function JobList() {
                 Job Link
               </a>{" "}
               <br />
-              Status: {job.status} | Date Applied: {new Date(job.created_at).toLocaleDateString()}
+              <span className="status">Status: {job.status}</span> |{" "}
+              <span className="date">Date Applied: {new Date(job.created_at).toLocaleDateString()}</span>
             </li>
           ))}
         </ul>

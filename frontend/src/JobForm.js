@@ -1,4 +1,5 @@
 import { useState } from "react";
+import './JobForm.css';
 
 function JobForm({ addJob }) {
   const [company, setCompany] = useState("");
@@ -29,37 +30,41 @@ function JobForm({ addJob }) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="job-form">
       <input 
+        className="job-input"
         type="text" 
         placeholder="Company Name" 
         value={company} 
         onChange={(e) => setCompany(e.target.value)} 
       />
       <input 
+        className="job-input"
         type="text" 
         placeholder="Job Title" 
         value={position} 
         onChange={(e) => setPosition(e.target.value)} 
       />
-       <input 
+      <input 
+        className="job-input"
         type="url" 
         placeholder="Job Link (URL)" 
         value={link} 
         onChange={(e) => setLink(e.target.value)} 
       />
       <input 
+        className="job-input"
         type="date" 
         value={dateApplied} 
         onChange={(e) => setDateApplied(e.target.value)} 
       />
-      <select value={status} onChange={(e) => setStatus(e.target.value)}>
+      <select className="job-select" value={status} onChange={(e) => setStatus(e.target.value)}>
         <option value="Applied">Applied</option>
         <option value="Interviewing">Interviewing</option>
         <option value="Offer">Offer</option>
         <option value="Rejected">Rejected</option>
       </select>
-      <button type="submit">Add Job</button>
+      <button className="job-button" type="submit">Add Job</button>
     </form>
   );
 }

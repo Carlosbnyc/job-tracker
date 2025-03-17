@@ -2,7 +2,8 @@ import { useState } from "react";
 import "./Auth.css"; // Import the CSS file
 import Logo from "../src/assets/jobtracker-logo.jpg"; // Ensure the correct path
 import { FaEye, FaEyeSlash } from "react-icons/fa"; 
-import { createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword, getAuth } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from './firebase-config'; // Ensure this imports the correct Firebase auth instance
 
 function Auth({ onAuthSuccess }) {
   const [isLogin, setIsLogin] = useState(true);

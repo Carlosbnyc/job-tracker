@@ -1,0 +1,144 @@
+/* App Container */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #1a1a2e;
+    color: white;
+    padding: 20px;
+    min-height: 100vh;
+    justify-content: flex-start;
+  }
+  
+  /* Title Styling */
+  .app-title {
+    font-size: 3rem;
+    font-weight: bold;
+    margin: 20px 0;
+    color: #ffffff;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  /* Logo Styling */
+  .app-logo {
+    width: 120px; /* Size of the logo */
+    height: auto;
+    margin-bottom: 20px;
+    border-radius: 10px;
+  }
+  
+  /* Logout Button Styling */
+  .logout-button {
+    background-color: #00bfff;
+    color: white;
+    font-size: 1.2rem;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: background-color 0.3s;
+  }
+  
+  .logout-button:hover {
+    background-color: #007bff;
+  }
+  
+  /* Job Form and Job List Styling */
+  .job-form, .job-list {
+    width: 100%;
+    max-width: 600px;
+    margin: 20px 0;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Input and Button Styling (Job Form) */
+  .job-form input,
+  .job-form select,
+  .job-form button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    outline: none;
+    box-sizing: border-box;
+  }
+  
+  .job-form button {
+    background-color: #00bfff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .job-form button:hover {
+    background-color: #007bff;
+  }
+  
+  /* Job List Item Styling */
+  .job-list ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .job-list li {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .job-list li a {
+    color: #00bfff;
+    text-decoration: none;
+  }
+  
+  .job-list li a:hover {
+    text-decoration: underline;
+  }
+  
+  .job-list li .status {
+    font-weight: bold;
+    color: #007bff;
+  }
+  
+  .job-list li .date {
+    font-style: italic;
+    color: #777;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .app-container {
+      padding: 15px;
+    }
+  
+    .app-title {
+      font-size: 2rem;
+    }
+  
+    .app-logo {
+      width: 100px;
+    }
+  
+    .logout-button {
+      font-size: 1rem;
+      padding: 8px 15px;
+    }
+  
+    .job-form input, .job-form select, .job-form button {
+      font-size: 1rem;
+      padding: 8px;
+    }
+  }
