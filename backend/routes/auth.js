@@ -2,38 +2,28 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { check, validationResult } = require("express-validator");
-const mongoose = require("mongoose");
-const User = require("../models/User");
+const { Client } = require("pg");
 
 const router = express.Router();
 
 console.log("✅ Auth.js is being loaded!");
 
-// ✅ Validate MongoDB Connection Once on Startup (Instead of Every Request)
-if (mongoose.connection.readyState !== 1) {
-  console.error("❌ Database is not connected at server start!");
-} else {
-  console.log("✅ MongoDB is ready.");
-}
-
-router.use(async (req, res, next) => {
-  console.log("🔍 Checking MongoDB Connection State:", mongoose.connection.readyState);
-
-  if (mongoose.connection.readyState !== 1) {
-    console.error("❌ Database is not ready! Request blocked.");
-    return res.status(503).json({ error: "Database connection is not ready. Try again later." });
-  }
-
-  try {
-    await mongoose.connection.db.admin().ping();  // <-- Ensure MongoDB is actually responding
-    console.log("✅ Database is responsive.");
-  } catch (error) {
-    console.error("❌ Database connection check failed:", error);
-    return res.status(503).json({ error: "Database connection issue. Try again later." });
-  }
-
-  next();
+// ✅ Setup PostgreSQL Client
+const client = new Client({
+  connectionString: process.env.DATABASE_URL,  // Heroku provides this automatically
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
+
+// Connect to PostgreSQL
+client.connect()
+  .then(() => {
+    console.log("✅ Connected to PostgreSQL!");
+  })
+  .catch(err => {
+    console.error("❌ Error connecting to PostgreSQL:", err);
+  });
 
 // ✅ Signup Route
 router.post("/signup", async (req, res) => {
@@ -43,11 +33,11 @@ router.post("/signup", async (req, res) => {
   console.log(`📩 Received email: ${email}`);
 
   try {
-    // Check if user exists
-    let user = await User.findOne({ email });
+    // Check if user exists in PostgreSQL
+    const result = await client.query('SELECT * FROM users WHERE email = $1', [email]);
 
-    if (user) {
-      console.log("❌ User already exists:", user);
+    if (result.rows.length > 0) {
+      console.log("❌ User already exists:", result.rows[0]);
       return res.status(400).json({ msg: "User already exists" });
     }
 
@@ -59,11 +49,10 @@ router.post("/signup", async (req, res) => {
 
     console.log("🔑 Hashed Password:", hashedPassword);
 
-    // Create & save user
-    user = new User({ email, password: hashedPassword });
-    await user.save();
+    // Insert the new user into the PostgreSQL database
+    await client.query('INSERT INTO users (email, password) VALUES ($1, $2)', [email, hashedPassword]);
 
-    console.log("✅ User successfully saved!", user);
+    console.log("✅ User successfully saved!");
 
     // Ensure JWT Secret is Set
     if (!process.env.JWT_SECRET) {
@@ -72,11 +61,27 @@ router.post("/signup", async (req, res) => {
     }
 
     // Generate JWT token
-    const token = jwt.sign({ user: { id: user.id } }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign({ user: { email } }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
     res.json({ token });
   } catch (err) {
     console.error("🔥 ERROR in signup:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// ✅ GET Route for all users
+router.get("/users", async (req, res) => {
+  console.log("✅ Fetching all users...");
+
+  try {
+    // Query to get all users
+    const result = await client.query("SELECT * FROM users");
+
+    // Send back the result in the response
+    res.json(result.rows);
+  } catch (err) {
+    console.error("🔥 Error fetching users:", err);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });

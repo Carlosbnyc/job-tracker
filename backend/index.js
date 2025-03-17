@@ -1,6 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-const mongoose = require("mongoose");
+const { Client } = require('pg');
 const cors = require("cors");
 
 const app = express();
@@ -9,46 +9,29 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✅ MongoDB Connection Function
-let isConnected = false; // Track connection state
-
-// ✅ MongoDB Connection Function
-
-const connectDB = async () => {
-  try {
-    if (mongoose.connection.readyState === 1) {
-      console.log("✅ MongoDB already connected.");
-      return;
-    }
-
-    console.log("🔍 Connecting to MongoDB...");
-    
-    await mongoose.connect(process.env.MONGO_URI, {
-      dbName: "jobtracker",
-      serverSelectionTimeoutMS: 10000, // Fail fast if MongoDB isn't reachable
-      socketTimeoutMS: 45000, // Keep socket connection stable
-      bufferCommands: true, // Enable buffering to prevent timeout errors
-      autoIndex: false, // Disable auto-indexing for performance
-    });
-
-    console.log("✅ MongoDB Connected successfully!");
-
-  } catch (error) {
-    console.error("❌ MongoDB Connection Error:", error);
-    process.exit(1);
+// ✅ PostgreSQL Connection
+const client = new Client({
+  connectionString: process.env.DATABASE_URL, // Heroku provides this automatically
+  ssl: {
+    rejectUnauthorized: false // Allow self-signed certificates (required for Heroku)
   }
-};
+});
 
+// Connect to PostgreSQL once and handle errors properly
+client.connect()
+  .then(() => {
+    console.log("✅ Connected to PostgreSQL!");
+  })
+  .catch(err => {
+    console.error("❌ Error connecting to PostgreSQL:", err);
+    process.exit(1); // Exit if database connection fails
+  });
 
-// ✅ Start the Server
+// ✅ Routes
 async function startServer() {
-  await connectDB(); // Ensure MongoDB is connected before starting Express
-
-  console.log("🚀 Starting Express server...");
-
-  // ✅ Load Routes
+  // ✅ Load Auth Routes
   console.log("Attempting to load auth routes...");
-  const authRoutes = require("./routes/auth");
+  const authRoutes = require("./routes/auth"); // Ensure your routes are correct
   app.use("/api/auth", authRoutes);
   console.log("✅ Auth routes loaded successfully!");
 
@@ -57,7 +40,7 @@ async function startServer() {
     res.json({ message: "✅ API is working!" });
   });
 
-  // ✅ Log all registered routes
+  // ✅ Log all registered routes for debugging
   console.log("🔍 Checking all registered routes...");
   app._router.stack.forEach((middleware) => {
     if (middleware.route) {
@@ -70,20 +53,21 @@ async function startServer() {
       });
     }
   });
-  // Gracefully close MongoDB connection when stopping the server
-process.on("SIGINT", async () => {
-  console.log("🛑 Closing MongoDB connection...");
-  await mongoose.connection.close();
-  console.log("✅ MongoDB connection closed.");
-  process.exit(0);
-});
 
+  // Gracefully shut down the server (Optional)
+  process.on("SIGINT", async () => {
+    console.log("🛑 Closing PostgreSQL connection...");
+    await client.end();
+    console.log("✅ PostgreSQL connection closed.");
+    process.exit(0);
+  });
+
+  // ✅ Start the app server
   const PORT = process.env.PORT || 5001;
-  app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+  });
 }
 
 // ✅ Start the app
 startServer();
-
-connectDB();
-module.exports = connectDB;
