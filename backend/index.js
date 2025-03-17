@@ -14,27 +14,25 @@ let isConnected = false; // Track connection state
 
 // ✅ MongoDB Connection Function
 async function connectDB() {
-  if (mongoose.connection.readyState === 1) {
-    console.log("✅ Already connected to MongoDB.");
-    return;
-  }
-
-  try {
-    await mongoose.connect(process.env.MONGO_URI, {
-      dbName: "jobtracker",
-      maxPoolSize: 5, // Limit concurrent connections
-      serverSelectionTimeoutMS: 10000,
-      socketTimeoutMS: 45000,
-      bufferCommands: false,
-    });
-
-    console.log("✅ MongoDB Connected successfully!");
-  } catch (err) {
-    console.error("❌ MongoDB Connection Error:", err);
-    process.exit(1);
+  if (mongoose.connection.readyState !== 1) {
+    try {
+      await mongoose.connect(process.env.MONGO_URI, {
+        dbName: 'jobtracker',
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        serverSelectionTimeoutMS: 10000,
+        socketTimeoutMS: 45000,
+        bufferCommands: false,
+      });
+      console.log('✅ MongoDB Connected successfully!');
+    } catch (error) {
+      console.error('❌ MongoDB Connection Error:', error);
+      process.exit(1);
+    }
+  } else {
+    console.log('✅ Already connected to MongoDB.');
   }
 }
-
 
 
 // ✅ Start the Server
