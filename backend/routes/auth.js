@@ -16,6 +16,25 @@ if (mongoose.connection.readyState !== 1) {
   console.log("✅ MongoDB is ready.");
 }
 
+router.use(async (req, res, next) => {
+  console.log("🔍 Checking MongoDB Connection State:", mongoose.connection.readyState);
+
+  if (mongoose.connection.readyState !== 1) {
+    console.error("❌ Database is not ready! Request blocked.");
+    return res.status(503).json({ error: "Database connection is not ready. Try again later." });
+  }
+
+  try {
+    await mongoose.connection.db.admin().ping();  // <-- Ensure MongoDB is actually responding
+    console.log("✅ Database is responsive.");
+  } catch (error) {
+    console.error("❌ Database connection check failed:", error);
+    return res.status(503).json({ error: "Database connection issue. Try again later." });
+  }
+
+  next();
+});
+
 // ✅ Signup Route
 router.post("/signup", async (req, res) => {
   console.log("✅ Signup route triggered!");

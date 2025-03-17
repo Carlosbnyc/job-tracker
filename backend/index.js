@@ -13,26 +13,31 @@ app.use(express.json());
 let isConnected = false; // Track connection state
 
 // ✅ MongoDB Connection Function
-async function connectDB() {
-  if (mongoose.connection.readyState !== 1) {
-    try {
-      await mongoose.connect(process.env.MONGO_URI, {
-        dbName: 'jobtracker',
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        serverSelectionTimeoutMS: 10000,
-        socketTimeoutMS: 45000,
-        bufferCommands: false,
-      });
-      console.log('✅ MongoDB Connected successfully!');
-    } catch (error) {
-      console.error('❌ MongoDB Connection Error:', error);
-      process.exit(1);
+
+const connectDB = async () => {
+  try {
+    if (mongoose.connection.readyState === 1) {
+      console.log("✅ MongoDB already connected.");
+      return;
     }
-  } else {
-    console.log('✅ Already connected to MongoDB.');
+
+    console.log("🔍 Connecting to MongoDB...");
+    
+    await mongoose.connect(process.env.MONGO_URI, {
+      dbName: "jobtracker",
+      serverSelectionTimeoutMS: 10000, // Fail fast if MongoDB isn't reachable
+      socketTimeoutMS: 45000, // Keep socket connection stable
+      bufferCommands: true, // Enable buffering to prevent timeout errors
+      autoIndex: false, // Disable auto-indexing for performance
+    });
+
+    console.log("✅ MongoDB Connected successfully!");
+
+  } catch (error) {
+    console.error("❌ MongoDB Connection Error:", error);
+    process.exit(1);
   }
-}
+};
 
 
 // ✅ Start the Server
