@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { addJobToServer, fetchJobs } from "./api"; // FIXED IMPORTS
+import { addJobToServer, fetchJobs } from "./api"; 
 import JobForm from "./JobForm";
 import JobList from "./JobList";
 import Auth from "./Auth";
-import './App.css';  // Import the App.css file for styling
+import Navbar from "./NavBar"; // Ensure filename matches case sensitivity
+import "./App.css"; 
 
 function App() {
   const [jobs, setJobs] = useState([]);
@@ -20,34 +21,26 @@ function App() {
   }, [isAuthenticated]);
 
   const handleAddJob = async (job) => {
-    const newJob = await addJobToServer(job); // FIXED FUNCTION CALL
+    const newJob = await addJobToServer(job);
     setJobs([...jobs, newJob]);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsAuthenticated(false);
   };
 
   return (
     <div className="app-container">
+      {isAuthenticated && <Navbar onLogout={handleLogout} />}
       {!isAuthenticated ? (
         <Auth onAuthSuccess={() => setIsAuthenticated(true)} />
       ) : (
-        <>
+        <div className="content">
           <h1 className="app-title">Job Tracker</h1>
-          <img 
-            className="app-logo"
-            src="/static/media/jobtracker-logo.1db786da2f2c064b0357.jpg" 
-            alt="Job Tracker Logo" 
-          />
-          <button 
-            className="logout-button"
-            onClick={() => { 
-              localStorage.removeItem("token"); 
-              setIsAuthenticated(false); 
-            }}
-          >
-            Logout
-          </button>
           <JobForm addJob={handleAddJob} />
           <JobList jobs={jobs} />
-        </>
+        </div>
       )}
     </div>
   );
